@@ -7,15 +7,15 @@ load("all_sample_label.Rdata")
 
 # data_other_gene<- sample_gene_matrix2
 data_other_gene <- adni_sample_snv_80000
-data_other_gene <- data_other_gene[row.names(all_sample_label), ] # 只保留具有标签的样本
-data_other_gene <- data.frame(data_other_gene, check.names = TRUE) # check.names是因为回归变量名不能有‘-’，比如找不到对象'HLA-B'
+data_other_gene <- data_other_gene[row.names(all_sample_label), ]
+data_other_gene <- data.frame(data_other_gene, check.names = TRUE)
 data_other_gene$label <- 0
 data_other_gene[row.names(all_sample_label), "label"] <- all_sample_label[, "label"]
 data_other_gene[which(data_other_gene$label == "CN"), "label"] <- 0
 data_other_gene[which(data_other_gene$label == "MCI"), "label"] <- 1
 data_other_gene[which(data_other_gene$label == "AD"), "label"] <- 2
 print("label data done")
-data_other_gene$label <- as.numeric(data_other_gene$label) # 否则报错
+data_other_gene$label <- as.numeric(data_other_gene$label)
 ########
 SNV_no <- ncol(data_other_gene) - 1
 X_SNV <- as.matrix(data_other_gene[, 1:SNV_no])
@@ -50,8 +50,8 @@ print("rmse done")
 ############
 temp <- coef(cvfit, lambda = optimalLambda, gamma = cvfit$fit$gamma[j])
 temp <- as.vector(temp)
-temp <- temp[-1] # 排除第一个位置上的intercept
-temp <- which(temp != 0) # 排除系数为0的冗余特征
+temp <- temp[-1]
+temp <- which(temp != 0)
 temp <- colnames(X_SNV)[temp]
 X_Y <- cbind(X_SNV[, temp], Y_label)
 X_Y_frame <- as.data.frame(X_Y)
@@ -60,18 +60,13 @@ fit_temp <- summary(lmfit)
 ########
 write.csv(fit_temp$coefficients, file = "feature_selected_byL0.csv")
 
-############## 两种颜色
-# 以下将sample_gene_matrix2转换为ComplexHeatmap所需数据格式
 feature_SNV_set <- SNP_top50$V1
 feature_SNV_set <- temp
-sample_gene_test <- X_SNV[, feature_SNV_set] # 取100个样本， 30个基因，测试
-######### 将0转为“ ”，1转为"MODERATE;",2转为"HIGH;"
+sample_gene_test <- X_SNV[, feature_SNV_set]
 sample_gene_test[which(sample_gene_test == 0)] <- " "
 sample_gene_test[which(sample_gene_test == 1)] <- "Heterozygote"
 sample_gene_test[which(sample_gene_test == 2)] <- "Mutanthomozygote"
-######## 画图
 mat <- t(as.matrix(sample_gene_test))
-# mat文件中含有: HOMDEL, AMP and MUT类型突变. 对突变进行颜色和突变分类定义
 col <- c(Heterozygote = "blue", Mutanthomozygote = "red")
 alter_fun <- list(
   background = function(x, y, w, h) {
@@ -92,15 +87,12 @@ alter_fun <- list(
     )
   }
 )
-###### column_title 和 heatmap_legend_param定义
 column_title <- "Feature SNPs selected OncoPrint"
 column_title <- "Top 50 SNPs OncoPrint"
 heatmap_legend_param <- list(
   title = "Alternations", at = c("Heterozygote", "Mutanthomozygote"),
   labels = c("Heterozygote", "Mutanthomozygote")
 )
-# 画图
-# 增加样品分组注释,两类别样本测试
 annotation_col <- data.frame(Class = factor(all_sample_label[, "label"])) # 27个AD样本，73个CN样本
 rownames(annotation_col) <- row.names(all_sample_label)
 
@@ -159,17 +151,14 @@ oncoPrint(mat_encode_all,
 )
 
 
-############################ 突变三种颜色
-# 以下将sample_gene_matrix2转换为ComplexHeatmap所需数据格式
 feature_SNV_set <- temp
-sample_gene_test <- X_SNV[, feature_SNV_set] # 取100个样本， 30个基因，测试
+sample_gene_test <- X_SNV[, feature_SNV_set]
 ######### 将0转为“ ”，1转为"MODERATE;",2转为"HIGH;"
 sample_gene_test[which(sample_gene_test == 0)] <- "Wildhomozygote"
 sample_gene_test[which(sample_gene_test == 1)] <- "Heterozygote"
 sample_gene_test[which(sample_gene_test == 2)] <- "Mutanthomozygote"
 ######## 画图
 mat <- t(as.matrix(sample_gene_test))
-# mat文件中含有: HOMDEL, AMP and MUT类型突变. 对突变进行颜色和突变分类定义
 col <- c(Wildhomozygote = "green", Heterozygote = "blue", Mutanthomozygote = "red")
 alter_fun <- list(
   background = function(x, y, w, h) {
@@ -201,8 +190,6 @@ heatmap_legend_param <- list(
   title = "Alternations", at = c("Wildhomozygote", "Heterozygote", "Mutanthomozygote"),
   labels = c("Wildhomozygote", "Heterozygote", "Mutanthomozygote")
 )
-# 画图
-# 增加样品分组注释,两类别样本测试
 annotation_col <- data.frame(Class = factor(all_sample_label[, "label"])) # 27个AD样本，73个CN样本
 rownames(annotation_col) <- row.names(all_sample_label)
 library(ComplexHeatmap)
