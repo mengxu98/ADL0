@@ -36,7 +36,7 @@ optimalLambdaIndex <- which.min(cvfit$cvMeans[[optimalGammaIndex]])
 optimalLambda <- cvfit$fit$lambda[[optimalGammaIndex]][optimalLambdaIndex]
 print("predicting...")
 y_cat <- predict(cvfit,
-  newx = X_SNV, # predict函数要求行为样本。所以需转置
+  newx = X_SNV,
   lambda = optimalLambda, gamma = cvfit$fit$gamma[j]
 )
 print("predict done")
@@ -93,7 +93,7 @@ heatmap_legend_param <- list(
   title = "Alternations", at = c("Heterozygote", "Mutanthomozygote"),
   labels = c("Heterozygote", "Mutanthomozygote")
 )
-annotation_col <- data.frame(Class = factor(all_sample_label[, "label"])) # 27个AD样本，73个CN样本
+annotation_col <- data.frame(Class = factor(all_sample_label[, "label"])) # 27 AD samples，73 CN samples
 rownames(annotation_col) <- row.names(all_sample_label)
 
 # BiocManager::install("ComplexHeatmap")
@@ -136,7 +136,7 @@ colnames(annotation_col_order) <- c("Class")
 mat_encode_all[which(mat_encode_all == 0)] <- " "
 mat_encode_all[which(mat_encode_all == 1)] <- "Heterozygote"
 mat_encode_all[which(mat_encode_all == 2)] <- "Mutanthomozygote"
-# annotation_col 顺序不对
+
 oncoPrint(mat_encode_all,
   alter_fun = alter_fun, col = col,
   remove_empty_columns = TRUE, remove_empty_rows = TRUE,
@@ -153,11 +153,11 @@ oncoPrint(mat_encode_all,
 
 feature_SNV_set <- temp
 sample_gene_test <- X_SNV[, feature_SNV_set]
-######### 将0转为“ ”，1转为"MODERATE;",2转为"HIGH;"
+# 0 as “ ”; 1 as "MODERATE"; 2 as "HIGH"
 sample_gene_test[which(sample_gene_test == 0)] <- "Wildhomozygote"
 sample_gene_test[which(sample_gene_test == 1)] <- "Heterozygote"
 sample_gene_test[which(sample_gene_test == 2)] <- "Mutanthomozygote"
-######## 画图
+
 mat <- t(as.matrix(sample_gene_test))
 col <- c(Wildhomozygote = "green", Heterozygote = "blue", Mutanthomozygote = "red")
 alter_fun <- list(
@@ -184,13 +184,13 @@ alter_fun <- list(
     )
   }
 )
-###### column_title 和 heatmap_legend_param定义
+###### column_title, heatmap_legend_param
 column_title <- "OncoPrint for ADNI, genes in geneset"
 heatmap_legend_param <- list(
   title = "Alternations", at = c("Wildhomozygote", "Heterozygote", "Mutanthomozygote"),
   labels = c("Wildhomozygote", "Heterozygote", "Mutanthomozygote")
 )
-annotation_col <- data.frame(Class = factor(all_sample_label[, "label"])) # 27个AD样本，73个CN样本
+annotation_col <- data.frame(Class = factor(all_sample_label[, "label"])) # 27 AD samples，73 CN samples
 rownames(annotation_col) <- row.names(all_sample_label)
 library(ComplexHeatmap)
 oncoPrint(mat,
@@ -204,6 +204,4 @@ oncoPrint(mat,
   heatmap_legend_param = heatmap_legend_param,
   alter_fun_is_vectorized = FALSE
 )
-
-SNP_top50 <- read.table("D:\\test\\AD\\figure 4.txt", head = FALSE)
-SNP_top50 <- read.table("/Users/mac/test/AD/figure 4.txt", head = FALSE)
+SNP_top50 <- read.table("figure 4.txt", head = FALSE)
