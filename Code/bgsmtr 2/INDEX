@@ -1,0 +1,9 @@
+bgsmtr                  Bayesian Group Sparse Multi-Task Regression for
+                        Imaging Genetics
+bgsmtr_example_data     Example Structural Neuroimaging and Genetic
+                        Data
+sp_bgsmtr               Spatial Bayesian Group Sparse Multi-Task
+                        Regression for Imaging Genetics
+sp_bgsmtr_example_data
+                        Example Structural Neuroimaging and Genetic
+                        Data for Spatial Model.
