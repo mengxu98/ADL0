@@ -1,9 +1,9 @@
 
 
-
+library(caret)
 library(bgsmtr)
 library(L0Learn)
-source("2-ADNI/bgsmtr/R/all_functions.R")
+source("bgsmtr/R/all_functions.R")
 data("bgsmtr_example_data") # Simulated data with 632 subjects, 486 SNPs from 33 genes, 15 structural neuroimaging measures.
 X <- bgsmtr_example_data$SNP_data
 Y <- bgsmtr_example_data$BrainMeasures
@@ -62,7 +62,8 @@ test_MTR <- function(X, folders, Y, Group) {
     )
     W_estimate <- fit$W_Wang_from_tuning_CV
     y_prediction <- predictMTR(W_estimate, X[, test_idx])
-    temp <- RMSE_MTR(Y[, test_idx], y_prediction)
+    temp <- RMSE(Y[, test_idx], y_prediction)
+    # temp <- RMSE_MTR(Y[, test_idx], y_prediction)
     rmse_res[[i]] <- temp
   }
   running_time <- proc.time() - ptm
@@ -83,7 +84,8 @@ test_singleROI <- function(X, folders, Y, Group) {
     fit_L0L2 <- fit_singleROI_L0(X[, train_idx], Y[, train_idx], maxSNVSize)
     global_list_fit[[i]] <- fit_L0L2
     y_pre_test <- predict_singleROI(X = X[, test_idx], fit = fit_L0L2)
-    temp <- RMSE_MTR(Y[, test_idx], y_pre_test)
+    temp <- RMSE(Y[, test_idx], y_pre_test)
+    # temp <- RMSE_MTR(Y[, test_idx], y_pre_test)
     rmse_res[[i]] <- temp
   }
   list_to_return <- list("rmse_res" = rmse_res, "fit_list" = global_list_fit)
@@ -94,10 +96,12 @@ folders <- my_createFolds(ncol(X), 10)
 ptm <- proc.time()
 rmse_res_l0 <- test_singleROI(X, folders, Y, bgsmtr_example_data$SNP_groups)
 running_time <- proc.time() - ptm
+running_time
 
 ptm <- proc.time()
 rmse_res_Wang <- test_MTR(X, folders, Y, bgsmtr_example_data$SNP_groups)
 running_time <- proc.time() - ptm
+running_time
 # user   system  elapsed
 # 6177.190  292.968 8884.787
 ###########
@@ -156,7 +160,7 @@ comparison_bar_rmse <- function(L0L2 = rmse_res_Wang, G_SMuRFS = rmse_res_l0) {
     }
     mydata["L0L2", ] <- y1
     mydata["G_SMuRFS", ] <- y2
-    ########
+    
     n <- nrow(mydata)
     cols <- rev(gray(0:(n + 1) / (n + 1)))[1:n]
 
@@ -176,7 +180,6 @@ comparison_bar_rmse <- function(L0L2 = rmse_res_Wang, G_SMuRFS = rmse_res_l0) {
   }
 }
 comparison_bar_rmse(L0L2 = rmse_res_Wang, G_SMuRFS = rmse_res_l0)
-
 
 xx <- c(105.521, 21.899)
 xx <- rbind(xx, c(6177.190, 36.826))
