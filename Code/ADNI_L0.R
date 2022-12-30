@@ -48,18 +48,15 @@ my_createFolds <- function(sample_no, folder_no = 10) {
   return(folders)
 }
 
-predictMTR <- function(W,X)
-{
+predictMTR <- function(W,X) {
   ###W*X=Y 
   y_prediction=t(W)%*%X
   return(y_prediction)
 }
 
-RMSE_MTR <- function(Y,Y_predict)
-{
+RMSE_MTR <- function(Y,Y_predict) {
   RMSE_res = c()
-  for(i in (1:nrow(Y)))
-  {
+  for(i in (1:nrow(Y))) {
     temp=rmse(Y[i,],Y_predict[i,])
     RMSE_res = c(RMSE_res,temp)
   }
