@@ -1,6 +1,7 @@
 
 
 library(caret)
+library(Metrics)
 library(bgsmtr)
 library(L0Learn)
 source("bgsmtr/R/all_functions.R")
@@ -47,6 +48,24 @@ my_createFolds <- function(sample_no, folder_no = 10) {
   return(folders)
 }
 
+predictMTR <- function(W,X)
+{
+  ###W*X=Y 
+  y_prediction=t(W)%*%X
+  return(y_prediction)
+}
+
+RMSE_MTR <- function(Y,Y_predict)
+{
+  RMSE_res = c()
+  for(i in (1:nrow(Y)))
+  {
+    temp=rmse(Y[i,],Y_predict[i,])
+    RMSE_res = c(RMSE_res,temp)
+  }
+  return(RMSE_res)
+}
+
 test_MTR <- function(X, folders, Y, Group) {
   ptm <- proc.time()
   rmse_res <- list()
@@ -62,8 +81,7 @@ test_MTR <- function(X, folders, Y, Group) {
     )
     W_estimate <- fit$W_Wang_from_tuning_CV
     y_prediction <- predictMTR(W_estimate, X[, test_idx])
-    temp <- RMSE(Y[, test_idx], y_prediction)
-    # temp <- RMSE_MTR(Y[, test_idx], y_prediction)
+    temp <- RMSE_MTR(Y[, test_idx], y_prediction)
     rmse_res[[i]] <- temp
   }
   running_time <- proc.time() - ptm
@@ -84,8 +102,7 @@ test_singleROI <- function(X, folders, Y, Group) {
     fit_L0L2 <- fit_singleROI_L0(X[, train_idx], Y[, train_idx], maxSNVSize)
     global_list_fit[[i]] <- fit_L0L2
     y_pre_test <- predict_singleROI(X = X[, test_idx], fit = fit_L0L2)
-    temp <- RMSE(Y[, test_idx], y_pre_test)
-    # temp <- RMSE_MTR(Y[, test_idx], y_pre_test)
+    temp <- RMSE_MTR(Y[, test_idx], y_pre_test)
     rmse_res[[i]] <- temp
   }
   list_to_return <- list("rmse_res" = rmse_res, "fit_list" = global_list_fit)
