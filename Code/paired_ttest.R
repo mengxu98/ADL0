@@ -2,15 +2,15 @@
 rmse_res_l0_matrix = matrix(unlist(rmse_res_l0), ncol = length(rmse_res_l0[[1]]), byrow = TRUE)
 rmse_res_Wang_matrix = matrix(unlist(rmse_res_Wang), ncol = length(rmse_res_Wang[[1]]), byrow = TRUE)
 
-# RMSE paired t-test
+# paired t-test for RMSE
 rmse_res_l0_mean = colMeans(rmse_res_l0_matrix)
 rmse_res_Wang_mean = colMeans(rmse_res_Wang_matrix)
 rmse_paired_ttest <- t.test(x=rmse_res_l0_mean, y=rmse_res_Wang_mean, paired=TRUE,alternative="two.sided")
 print(rmse_paired_ttest$statistic)
 print(rmse_paired_ttest$p.value)
 
-# Data S1 t=1.692417, p=0.05634634,
-# Data S2 t=61.11133, p=3.217035e-48
+# Data S1: t=1.692417, p=0.05634634,
+# Data S2: t=61.11133, p=3.217035e-48
 
 # two side
 # S1 t=-1.692417, p=0.1126927 -240.6586
@@ -44,4 +44,3 @@ print(shapiro_test)
 wilcox_test = wilcox.test(rmse_res_l0_mean, rmse_res_Wang_mean, data=paired_data,  paired=TRUE, alternative = "two.sided")
 print(wilcox_test)
 print(median(rmse_res_l0_mean-rmse_res_Wang_mean))
-
