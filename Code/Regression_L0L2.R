@@ -1,9 +1,15 @@
 
+
+library(caret)
+library(Metrics)
 library(bgsmtr)
 library(L0Learn)
-source("2-ADNI/bgsmtr/R/all_functions.R")
-load("adni_sample_snv_80000.Rdata")
-load("all_sample_label.Rdata")
+# BiocManager::install("ComplexHeatmap")
+library(ComplexHeatmap)
+source("bgsmtr/R/all_functions.R")
+source("Function.R")
+load("../Data/adni_sample_snv_80000.Rdata")
+load("../Data/all_sample_label.Rdata")
 
 # data_other_gene<- sample_gene_matrix2
 data_other_gene <- adni_sample_snv_80000
@@ -42,12 +48,10 @@ y_cat <- predict(cvfit,
 print("predict done")
 y_hat <- as.vector(y_cat)
 
-library(Metrics)
 res_rmse <- rmse(Y_label, y_hat)
 res_rse <- rse(Y_label, y_hat)
 r_square <- 1 - res_rse
 print("rmse done")
-############
 temp <- coef(cvfit, lambda = optimalLambda, gamma = cvfit$fit$gamma[j])
 temp <- as.vector(temp)
 temp <- temp[-1]
@@ -57,8 +61,7 @@ X_Y <- cbind(X_SNV[, temp], Y_label)
 X_Y_frame <- as.data.frame(X_Y)
 lmfit <- lm(Y_label ~ ., data = X_Y_frame)
 fit_temp <- summary(lmfit)
-########
-write.csv(fit_temp$coefficients, file = "feature_selected_byL0.csv")
+write.csv(fit_temp$coefficients, file = "../Results/feature_selected_byL0.csv")
 
 feature_SNV_set <- SNP_top50$V1
 feature_SNV_set <- temp
@@ -93,11 +96,8 @@ heatmap_legend_param <- list(
   title = "Alternations", at = c("Heterozygote", "Mutanthomozygote"),
   labels = c("Heterozygote", "Mutanthomozygote")
 )
-annotation_col <- data.frame(Class = factor(all_sample_label[, "label"])) # 27 AD samples，73 CN samples
+annotation_col <- data.frame(Class = factor(all_sample_label[, "label"])) # 27 AD samples,73 CN samples
 rownames(annotation_col) <- row.names(all_sample_label)
-
-# BiocManager::install("ComplexHeatmap")
-library(ComplexHeatmap)
 
 memoSort <- function(M) {
   geneOrder <- sort(rowSums(M), decreasing = TRUE, index.return = TRUE)$ix
@@ -150,7 +150,6 @@ oncoPrint(mat_encode_all,
   alter_fun_is_vectorized = FALSE, column_order = colnames(mat_encode_all)
 )
 
-
 feature_SNV_set <- temp
 sample_gene_test <- X_SNV[, feature_SNV_set]
 # 0 as “ ”; 1 as "MODERATE"; 2 as "HIGH"
@@ -184,15 +183,14 @@ alter_fun <- list(
     )
   }
 )
-###### column_title, heatmap_legend_param
+# Column_title, heatmap_legend_param
 column_title <- "OncoPrint for ADNI, genes in geneset"
 heatmap_legend_param <- list(
   title = "Alternations", at = c("Wildhomozygote", "Heterozygote", "Mutanthomozygote"),
   labels = c("Wildhomozygote", "Heterozygote", "Mutanthomozygote")
 )
-annotation_col <- data.frame(Class = factor(all_sample_label[, "label"])) # 27 AD samples，73 CN samples
+annotation_col <- data.frame(Class = factor(all_sample_label[, "label"])) # 27 AD samples,73 CN samples
 rownames(annotation_col) <- row.names(all_sample_label)
-library(ComplexHeatmap)
 oncoPrint(mat,
   alter_fun = alter_fun, col = col,
   remove_empty_columns = TRUE, remove_empty_rows = TRUE,
@@ -204,4 +202,4 @@ oncoPrint(mat,
   heatmap_legend_param = heatmap_legend_param,
   alter_fun_is_vectorized = FALSE
 )
-SNP_top50 <- read.table("figure 4.txt", head = FALSE)
+SNP_top50 <- read.table("../Results/figure 4.txt", head = FALSE)
