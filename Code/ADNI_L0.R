@@ -111,13 +111,15 @@ ptm <- proc.time()
 rmse_res_l0 <- test_singleROI(X, folders, Y, bgsmtr_example_data$SNP_groups)
 running_time <- proc.time() - ptm
 running_time
+# user  system elapsed 
+# 94.45    0.78  103.86
 
 ptm <- proc.time()
 rmse_res_Wang <- test_MTR(X, folders, Y, bgsmtr_example_data$SNP_groups)
 running_time <- proc.time() - ptm
 running_time
-# user   system  elapsed
-# 6177.190  292.968 8884.787
+# user  system elapsed 
+# 3962.19   57.14 4475.31
 ###########
 library(ggplot2)
 comparison_res_rmse <- function(L0L2 = rmse_res_Wang, G_SMuRFS = rmse_res_l0) {
@@ -195,8 +197,8 @@ comparison_bar_rmse <- function(L0L2 = rmse_res_Wang, G_SMuRFS = rmse_res_l0) {
 }
 comparison_bar_rmse(L0L2 = rmse_res_Wang, G_SMuRFS = rmse_res_l0)
 
-xx <- c(105.521, 21.899)
-xx <- rbind(xx, c(6177.190, 36.826))
+xx <- c(103.86, 0.78)
+xx <- rbind(xx, c(4475.30, 57.14))
 row.names(xx) <- c("L0L2", "G_SMuRFS")
 n <- nrow(xx)
 cols <- rev(gray(0:(n + 1) / (n + 1)))[1:n]
@@ -207,7 +209,7 @@ barplot(xx,
 )
 box()
 ############
-xx <- c(105.521, 6177.190)
+xx <- c(103.86, 4475.30)
 names(xx) <- c("L0L2", "G_SMuRFS")
 n <- length(xx)
 cols <- rev(gray(0:(n + 1) / (n + 1)))[1:n]
